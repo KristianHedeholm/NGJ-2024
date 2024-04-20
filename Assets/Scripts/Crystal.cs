@@ -2,8 +2,8 @@ using UnityEngine;
 
 public class Crystal : MonoBehaviour
 {
-    public void SetTargetAngel(float angel)
+    public void SetTargetAngle(float angle)
     {
-        transform.rotation = Quaternion.AngleAxis(angel, Vector3.forward);
+        transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
     }
 }

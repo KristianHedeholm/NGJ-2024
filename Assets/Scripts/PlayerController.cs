@@ -211,8 +211,15 @@ public class PlayerController : MonoBehaviour
         _moveHorizontalNegative = false;
         _xMove = 0.0f;
 
-        var aimDirection = _player.GetAxis2D("Horizontal", "Vertical");
-        var aimNormilized = aimDirection.normalized;
+        if (_player.GetAxis2D("Horizontal", "Vertical").magnitude < 0.5f)
+        {
+            ResetAimLine();
+            return _state;
+        }
+
+        var aimAngle = _player.GetAxis2D("Horizontal", "Vertical").ToAngleDeg();
+        aimAngle = Mathf.Round(aimAngle / 45.0f) * 45.0f;
+        var aimNormilized = aimAngle.DegAngleToDir(1);
         var playerPosition = new Vector2(
             _currentRigidbody.position.x,
             _currentRigidbody.position.y
@@ -356,8 +363,8 @@ public class PlayerController : MonoBehaviour
             return newState;
         }
 
-        float angel = _player.GetAxis2D("Horizontal", "Vertical").ToAngleDeg();
-        _targetCrystal.SetTargetAngel(angel);
+        float angle = _player.GetAxis2D("Horizontal", "Vertical").ToAngleDeg();
+        _targetCrystal.SetTargetAngle(Mathf.Round(angle / 45.0f) * 45.0f);
 
         if (_player.GetButtonDown("MainAction"))
         {
