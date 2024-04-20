@@ -72,7 +72,7 @@ public class PlayerController : MonoBehaviour
         ResetAimLine();
     }
 
-    private void Update() 
+    private void Update()
     {
         if (_state != EPlayerState.Normal)
         {
@@ -219,8 +219,6 @@ public class PlayerController : MonoBehaviour
 
             _currentRigidbody.AddForce(Vector2.down * springForce);
         }
-
-        
 
         return EPlayerState.Normal;
     }
