@@ -1,11 +1,24 @@
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class SceneManager : Singleton<SceneManager>
 {
     public void GetNextScene()
     {
+        if(!CanGetNextScene())
+        {
+            return;
+        }
+
         var sceneIndex = GetCurrentScene().buildIndex;
         UnityEngine.SceneManagement.SceneManager.LoadScene(sceneIndex + 1);
+    }
+
+    public bool CanGetNextScene()
+    {
+        var sceneIndex = GetCurrentScene().buildIndex;
+        var numberOfScenes = UnityEngine.SceneManagement.SceneManager.sceneCountInBuildSettings - 1;
+        return sceneIndex < numberOfScenes;
     }
 
     public void ResetScene()
