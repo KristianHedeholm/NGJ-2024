@@ -105,7 +105,7 @@ public class PlayerController : MonoBehaviour
                 if (_player.GetButtonDown("MainAction"))
                 {
                     var direction = endOfLinePoint - playerPosition;
-                    var hit = Physics2D.Raycast(endOfLinePoint, direction, 5.0f, _shootingLayerMask);
+                    var hit = Physics2D.Raycast(endOfLinePoint, direction, 5000.0f, _shootingLayerMask);
                     if (hit.collider == null)
                     {
                         return;
