@@ -45,7 +45,7 @@ public static class VectorExtensions
     /// <returns>The angle in degrees</returns>
     public static float ToAngleDeg(this Vector2 v)
     {
-        return Mathf.Atan2(v.x, v.y) * Mathf.Rad2Deg;
+        return Mathf.Atan2(v.y, v.x) * Mathf.Rad2Deg;
     }
 
     /// <summary>

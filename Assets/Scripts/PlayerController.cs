@@ -106,26 +106,30 @@ public class PlayerController : MonoBehaviour
                 {
                     var direction = endOfLinePoint - playerPosition;
                     var hit = Physics2D.Raycast(endOfLinePoint, direction, 5000.0f, _shootingLayerMask);
-                    if (hit.collider == null)
-                    {
-                        return;
-                    }
 
-                    if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Body"))
+                    if (hit.collider != null && hit.collider.gameObject.layer == LayerMask.NameToLayer("Body"))
                     {
                         if (hit.collider.TryGetComponent<Body>(out var body))
                         {
                             EnterBody(body);
+                            return;
                         }
                     }
 
-                    if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Crystal"))
+                    if (hit.collider != null && hit.collider.gameObject.layer == LayerMask.NameToLayer("Crystal"))
                     {
                         if (hit.collider.TryGetComponent<Crystal>(out var crystal))
                         {
                             EnterCrystal(crystal);
-                            SetState(EPlayerState.Crystal);
+                            return;
                         }
+                    }
+
+                    var hitOverlap = Physics2D.OverlapCircle(playerPosition, 1.0f, _bodyLayerMask);
+                    if(hitOverlap != null && hitOverlap.TryGetComponent<Body>(out var bodyNew))
+                    {
+                        EnterBody(bodyNew);
+                        return;
                     }
                 }
 
@@ -158,7 +162,11 @@ public class PlayerController : MonoBehaviour
 
         if (_state == EPlayerState.Crystal)
         {
-            float aimX = _player.GetAxis("Horizontal");
+            float angel = _player.GetAxis2D("Horizontal", "Vertical").ToAngleDeg();
+            if(_crystal != null)
+            {
+                _crystal.SetTargetAngel(angel);
+            }
         }
     }
 
@@ -177,11 +185,13 @@ public class PlayerController : MonoBehaviour
 
     private void EnterCrystal(Crystal crystal)
     {
+        ResetAimLine();
         _crystal = crystal;
-        _currentRigidbody = null;
+        _rb2d.simulated = false;
+        _currentRigidbody = _rb2d;
         _controlBody = false;
         _sprite.SetActive(false);
-        _rb2d.simulated = false;
+        SetState(EPlayerState.Crystal);
     }
 
     private void UpdateState()
@@ -230,7 +240,7 @@ public class PlayerController : MonoBehaviour
 
     private void SetState(EPlayerState state)
     {
-        switch (_state)
+        switch (state)
         {
             case EPlayerState.Normal:
                 _state = NormalFixUpdate();
