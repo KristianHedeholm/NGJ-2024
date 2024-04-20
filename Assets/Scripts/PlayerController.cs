@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Rewired;
 using UnityEngine;
+using Shapes;
 
 public class PlayerController : MonoBehaviour
 {
@@ -41,7 +42,7 @@ public class PlayerController : MonoBehaviour
     private float _acceleration;
 
     [SerializeField]
-    private Transform _aimMarker;
+    private Line _aimLine;
 
     private void Start()
     {
@@ -50,7 +51,7 @@ public class PlayerController : MonoBehaviour
 
         _prevState = _state = EPlayerState.Normal;
 
-        _aimMarker.gameObject.SetActive(false);
+        ResetAimLine();
     }
 
     private void Update()
@@ -104,8 +105,7 @@ public class PlayerController : MonoBehaviour
 
     private EPlayerState NormalUpdate()
     {
-        _aimMarker.gameObject.SetActive(false);
-
+        ResetAimLine();
 
         float xMove = _player.GetAxis("Horizontal");
 
@@ -143,15 +143,15 @@ public class PlayerController : MonoBehaviour
             return EPlayerState.Normal;
         }
 
-        _aimMarker.gameObject.SetActive(true);
-
         float aimX = _player.GetAxis("AimHorizontal");
         float aimY = _player.GetAxis("AimVertical");
 
         var aimDirection = new Vector2(aimX, aimY);
         var aimNormilized = aimDirection.normalized;
         var playerPosition = new Vector2(transform.position.x, transform.position.y);
-        _aimMarker.position = playerPosition + aimNormilized;
+
+        _aimLine.Start = _rb2d.position;
+        _aimLine.End = playerPosition + aimNormilized;
 
 
         return EPlayerState.Normal;
@@ -167,6 +167,12 @@ public class PlayerController : MonoBehaviour
     }
 
     private void ZipEnd() { }
+
+    private void ResetAimLine()
+    {
+        _aimLine.Start = Vector3.zero;
+        _aimLine.End = Vector3.zero;
+    }
 
     #endregion
 }
