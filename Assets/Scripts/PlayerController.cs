@@ -107,7 +107,12 @@ public class PlayerController : MonoBehaviour
             {
                 var direction = endOfLinePoint - playerPosition;
                 var hit = Physics2D.Raycast(endOfLinePoint, direction, 5.0f, _shootingLayerMask);
-                if(hit.collider != null && hit.collider.gameObject.layer == LayerMask.NameToLayer("Body"))
+                if(hit.collider == null)
+                {
+                    return;
+                }
+
+                if(hit.collider.gameObject.layer == LayerMask.NameToLayer("Body"))
                 {
                     if(hit.collider.TryGetComponent<Body>(out var body))
                     {
