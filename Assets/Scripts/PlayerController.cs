@@ -1,6 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using Rewired;
+using Shapes;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -14,6 +13,7 @@ public class PlayerController : MonoBehaviour
     {
         Normal,
         Zip, // Teleporting through light
+        Crystal,
     }
 
     private EPlayerState _prevState;
@@ -21,6 +21,9 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField]
     private LayerMask collisionMask;
+
+    [SerializeField]
+    private GameObject _sprite;
 
     [SerializeField]
     private float rideHeight;
@@ -40,17 +43,122 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private float _acceleration;
 
+    private Line _aimLine;
+
+    [SerializeField]
+    private Body _body = null;
+
+    [SerializeField]
+    private LayerMask _bodyLayerMask;
+
+    [SerializeField]
+    private LayerMask _shootingLayerMask;
+
+    private Rigidbody2D _currentRigidbody;
+    private bool _controlBody;
+    private bool _moveHorizontal;
+    private bool _moveHorizontalNegative;
+    private float _xMove;
+
     private void Start()
     {
         _player = ReInput.players.GetPlayer(0);
         _rb2d = GetComponent<Rigidbody2D>();
+        _currentRigidbody = _rb2d;
 
         _prevState = _state = EPlayerState.Normal;
+
+        var prefab = LineManager.Instance.GetLine(LineManager.Line.AimLine);
+        var gameObject = Instantiate(prefab, Vector3.zero, Quaternion.identity);
+        _aimLine = gameObject.GetComponent<Line>();
+
+        ResetAimLine();
     }
 
     private void Update()
     {
+        if (_state != EPlayerState.Normal)
+        {
+            return;
+        }
+
+        if (_player.GetButton("AimMode") || !_controlBody)
+        {
+            _moveHorizontal = false;
+            _moveHorizontalNegative = false;
+            _xMove = 0.0f;
+
+            float aimX = _player.GetAxis("Horizontal");
+            float aimY = _player.GetAxis("Vertical");
+
+            var aimDirection = new Vector2(aimX, aimY);
+            var aimNormilized = aimDirection.normalized;
+            var playerPosition = new Vector2(
+                _currentRigidbody.position.x,
+                _currentRigidbody.position.y
+            );
+
+            var endOfLinePoint = playerPosition + aimNormilized;
+
+            _aimLine.Start = _currentRigidbody.position;
+            _aimLine.End = endOfLinePoint;
+
+            if (_player.GetButtonDown("MainAction"))
+            {
+                var direction = endOfLinePoint - playerPosition;
+                var hit = Physics2D.Raycast(endOfLinePoint, direction, 5.0f, _shootingLayerMask);
+                if (hit.collider == null)
+                {
+                    return;
+                }
+
+                if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Body"))
+                {
+                    if (hit.collider.TryGetComponent<Body>(out var body))
+                    {
+                        EnterBody(body);
+                    }
+                }
+            }
+
+            return;
+        }
+
+        if (!_controlBody)
+        {
+            return;
+        }
+
+        ResetAimLine();
+
+        if (_player.GetButtonDown("MainAction"))
+        {
+            _controlBody = false;
+            _rb2d.simulated = true;
+
+            _rb2d.position = _currentRigidbody.position;
+            _currentRigidbody = _rb2d;
+            _sprite.SetActive(true);
+        }
+
+        transform.position = _currentRigidbody.position;
+
+        _moveHorizontal = _player.GetButtonDown("Horizontal");
+        _moveHorizontalNegative = _player.GetNegativeButtonDown("Horizontal");
+        _xMove = _player.GetAxis("Horizontal");
+    }
+
+    private void FixedUpdate()
+    {
         UpdateState();
+    }
+
+    private void EnterBody(Body body)
+    {
+        _currentRigidbody = body.Rigidbody2D;
+        _controlBody = true;
+        _sprite.SetActive(false);
+        _rb2d.simulated = false;
     }
 
     private void UpdateState()
@@ -58,10 +166,14 @@ public class PlayerController : MonoBehaviour
         switch (_state)
         {
             case EPlayerState.Normal:
-                _state = NormalUpdate();
+                _state = NormalFixUpdate();
                 break;
             case EPlayerState.Zip:
                 _state = ZipUpdate();
+                break;
+
+            case EPlayerState.Crystal:
+                _state = CrystalUpdate();
                 break;
         }
 
@@ -93,25 +205,40 @@ public class PlayerController : MonoBehaviour
         _prevState = _state;
     }
 
+    private void SetState(EPlayerState state)
+    {
+        switch (_state)
+        {
+            case EPlayerState.Normal:
+                _state = NormalFixUpdate();
+                break;
+            case EPlayerState.Zip:
+                _state = ZipUpdate();
+                break;
+
+            case EPlayerState.Crystal:
+                _state = CrystalUpdate();
+                break;
+        }
+    }
+
     #region Player states
 
     private void NormalStart() { }
 
-    private EPlayerState NormalUpdate()
+    private EPlayerState NormalFixUpdate()
     {
-        float xMove = _player.GetAxis("Horizontal");
+        var speed = _currentRigidbody.velocity;
+        speed.x = Mathf.MoveTowards(speed.x, _xMove * _maxHSpeed, _acceleration * Time.deltaTime);
+        _currentRigidbody.velocity = speed;
 
-        var speed = _rb2d.velocity;
-        speed.x = Mathf.MoveTowards(speed.x, xMove * _maxHSpeed, _acceleration * Time.deltaTime);
-        _rb2d.velocity = speed;
-
-        if (_player.GetButtonDown("Horizontal") || _player.GetNegativeButtonDown("Horizontal"))
+        if (_moveHorizontal || _moveHorizontalNegative)
         {
-            _rb2d.AddForce(Vector2.down * 3f, ForceMode2D.Impulse);
+            _currentRigidbody.AddForce(Vector2.down * 3f, ForceMode2D.Impulse);
         }
 
         RaycastHit2D hit = Physics2D.Raycast(
-            transform.position,
+            _currentRigidbody.position,
             Vector3.down,
             rayDistance,
             collisionMask
@@ -119,7 +246,7 @@ public class PlayerController : MonoBehaviour
 
         if (hit.collider != null)
         {
-            Vector2 vel = _rb2d.velocity;
+            Vector2 vel = _currentRigidbody.velocity;
 
             float rayDirVel = Vector2.Dot(Vector2.down, vel);
 
@@ -127,7 +254,7 @@ public class PlayerController : MonoBehaviour
 
             float springForce = (x * rideSpringStrength) - (rayDirVel * rideSpringDamp);
 
-            _rb2d.AddForce(Vector2.down * springForce);
+            _currentRigidbody.AddForce(Vector2.down * springForce);
         }
 
         return EPlayerState.Normal;
@@ -144,5 +271,28 @@ public class PlayerController : MonoBehaviour
 
     private void ZipEnd() { }
 
+    private void CrystalStart() { }
+
+    private EPlayerState CrystalUpdate()
+    {
+        return EPlayerState.Crystal;
+    }
+
+    private void CrystalEnd() { }
+
     #endregion
+
+    private void ResetAimLine()
+    {
+        _aimLine.Start = Vector3.zero;
+        _aimLine.End = Vector3.zero;
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawLine(transform.position, transform.position - Vector3.up * rayDistance);
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawLine(transform.position, transform.position - Vector3.up * rideHeight);
+    }
 }

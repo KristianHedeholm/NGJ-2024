@@ -1,11 +1,11 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class SceneManager : Singleton<SceneManager>
+public class LevelManager : Singleton<LevelManager>
 {
     public void GetNextScene()
     {
-        if(!CanGetNextScene())
+        if (!CanGetNextScene())
         {
             return;
         }
