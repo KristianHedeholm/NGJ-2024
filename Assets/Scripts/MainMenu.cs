@@ -8,7 +8,7 @@ public class MainMenu : MonoBehaviour
         // Change so this works with Rewind.
         if(Input.GetKeyDown(KeyCode.Space))
         {
-            SceneManager.Instance.GetNextScene();
+            LevelManager.Instance.GetNextScene();
         }
     }
 }
