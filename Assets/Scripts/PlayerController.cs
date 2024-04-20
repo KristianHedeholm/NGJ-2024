@@ -41,7 +41,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private float _acceleration;
 
-    [SerializeField]
     private Line _aimLine;
 
     private void Start()
@@ -50,6 +49,10 @@ public class PlayerController : MonoBehaviour
         _rb2d = GetComponent<Rigidbody2D>();
 
         _prevState = _state = EPlayerState.Normal;
+
+        var prefab = LineManager.Instance.GetLine(LineManager.Line.AimLine);
+        var gameObject = Instantiate(prefab, Vector3.zero, Quaternion.identity);
+        _aimLine = gameObject.GetComponent<Line>();
 
         ResetAimLine();
     }
