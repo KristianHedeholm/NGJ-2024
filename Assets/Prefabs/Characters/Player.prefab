@@ -112,7 +112,7 @@ MonoBehaviour:
   collisionMask:
     serializedVersion: 2
     m_Bits: 8
-  _spriteRenderer: {fileID: 2831044115384553805}
+  _sprite: {fileID: 7022380911801027599}
   rideHeight: 1
   rayDistance: 1.5
   rideSpringStrength: 80

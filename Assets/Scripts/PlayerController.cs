@@ -23,7 +23,7 @@ public class PlayerController : MonoBehaviour
     private LayerMask collisionMask;
 
     [SerializeField]
-    private SpriteRenderer _spriteRenderer;
+    private GameObject _sprite;
 
     [SerializeField]
     private float rideHeight;
@@ -107,18 +107,18 @@ public class PlayerController : MonoBehaviour
             {
                 var direction = endOfLinePoint - playerPosition;
                 var hit = Physics2D.Raycast(endOfLinePoint, direction, 5.0f, _shootingLayerMask);
-                if(hit.collider == null)
+                if (hit.collider == null)
                 {
                     return;
                 }
 
-                if(hit.collider.gameObject.layer == LayerMask.NameToLayer("Body"))
+                if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Body"))
                 {
-                    if(hit.collider.TryGetComponent<Body>(out var body))
+                    if (hit.collider.TryGetComponent<Body>(out var body))
                     {
                         EnterBody(body);
                     }
-                }                
+                }
             }
 
             return;
@@ -138,7 +138,7 @@ public class PlayerController : MonoBehaviour
 
             _rb2d.position = _currentRigidbody.position;
             _currentRigidbody = _rb2d;
-            _spriteRenderer.enabled = true;
+            _sprite.SetActive(true);
         }
 
         transform.position = _currentRigidbody.position;
@@ -157,7 +157,7 @@ public class PlayerController : MonoBehaviour
     {
         _currentRigidbody = body.Rigidbody2D;
         _controlBody = true;
-        _spriteRenderer.enabled = false;
+        _sprite.SetActive(false);
         _rb2d.simulated = false;
     }
 
@@ -280,11 +280,19 @@ public class PlayerController : MonoBehaviour
 
     private void CrystalEnd() { }
 
+    #endregion
+
     private void ResetAimLine()
     {
         _aimLine.Start = Vector3.zero;
         _aimLine.End = Vector3.zero;
     }
 
-    #endregion
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawLine(transform.position, transform.position - Vector3.up * rayDistance);
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawLine(transform.position, transform.position - Vector3.up * rideHeight);
+    }
 }
