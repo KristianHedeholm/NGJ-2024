@@ -47,10 +47,17 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private Body _body = null;
 
+    [SerializeField]
+    private LayerMask _bodyLayerMask;
+
+    private Rigidbody2D _currentRigidbody;
+    private bool _controlBody;
+
     private void Start()
     {
         _player = ReInput.players.GetPlayer(0);
         _rb2d = GetComponent<Rigidbody2D>();
+        _currentRigidbody = _rb2d;
 
         _prevState = _state = EPlayerState.Normal;
 
@@ -116,28 +123,37 @@ public class PlayerController : MonoBehaviour
 
     private EPlayerState NormalUpdate()
     {
-       
-        var rb2d = _rb2d;
-        if(_body != null)
+        if(_player.GetButtonDown("GrabBody"))
         {
-            rb2d = _body.Rigidbody2D;
+            var collider = Physics2D.OverlapCircle(_currentRigidbody.position, 1.0f, _bodyLayerMask.value);
+
+            if(collider != null && collider.TryGetComponent<Body>(out var body))
+            {
+                _currentRigidbody = body.Rigidbody2D;
+                _controlBody = true;
+            }
+            else
+            {
+                _currentRigidbody = _rb2d;
+                _controlBody = false;
+            }
         }
-        
+
         ResetAimLine();
 
         float xMove = _player.GetAxis("Horizontal");
 
-        var speed = rb2d.velocity;
+        var speed = _currentRigidbody.velocity;
         speed.x = Mathf.MoveTowards(speed.x, xMove * _maxHSpeed, _acceleration * Time.deltaTime);
-        rb2d.velocity = speed;
+        _currentRigidbody.velocity = speed;
 
         if (_player.GetButtonDown("Horizontal") || _player.GetNegativeButtonDown("Horizontal"))
         {
-            rb2d.AddForce(Vector2.down * 3f, ForceMode2D.Impulse);
+            _currentRigidbody.AddForce(Vector2.down * 3f, ForceMode2D.Impulse);
         }
 
         RaycastHit2D hit = Physics2D.Raycast(
-            rb2d.position,
+            _currentRigidbody.position,
             Vector3.down,
             rayDistance,
             collisionMask
@@ -145,7 +161,7 @@ public class PlayerController : MonoBehaviour
 
         if (hit.collider != null)
         {
-            Vector2 vel = rb2d.velocity;
+            Vector2 vel = _currentRigidbody.velocity;
 
             float rayDirVel = Vector2.Dot(Vector2.down, vel);
 
@@ -153,10 +169,10 @@ public class PlayerController : MonoBehaviour
 
             float springForce = (x * rideSpringStrength) - (rayDirVel * rideSpringDamp);
 
-            rb2d.AddForce(Vector2.down * springForce);
+            _currentRigidbody.AddForce(Vector2.down * springForce);
         }
 
-        if(!Mathf.Approximately(rb2d.velocity.x, 0))
+        if(!Mathf.Approximately(_currentRigidbody.velocity.x, 0))
         {
             return EPlayerState.Normal;
         }
@@ -166,9 +182,9 @@ public class PlayerController : MonoBehaviour
 
         var aimDirection = new Vector2(aimX, aimY);
         var aimNormilized = aimDirection.normalized;
-        var playerPosition = new Vector2(rb2d.position.x, rb2d.position.y);
+        var playerPosition = new Vector2(_currentRigidbody.position.x, _currentRigidbody.position.y);
 
-        _aimLine.Start = rb2d.position;
+        _aimLine.Start = _currentRigidbody.position;
         _aimLine.End = playerPosition + aimNormilized;
 
 
