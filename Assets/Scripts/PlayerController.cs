@@ -50,6 +50,9 @@ public class PlayerController : MonoBehaviour
 
     private Rigidbody2D _currentRigidbody;
     private bool _controlBody;
+    private bool _moveHorizontal;
+    private bool _moveHorizontalNegative;
+    private float xMove;
 
     private void Start()
     {
@@ -64,6 +67,54 @@ public class PlayerController : MonoBehaviour
         _aimLine = gameObject.GetComponent<Line>();
 
         ResetAimLine();
+    }
+
+    private void Update() 
+    {
+        if (_state != EPlayerState.Normal)
+        {
+            return;
+        }
+
+        if (_player.GetButtonDown("GrabBody"))
+        {
+            var collider = Physics2D.OverlapCircle(
+                _currentRigidbody.position,
+                1.05f,
+                _bodyLayerMask.value
+            );
+
+            if (collider != null && collider.TryGetComponent<Body>(out var body))
+            {
+                _currentRigidbody = body.Rigidbody2D;
+                _controlBody = true;
+            }
+        }
+
+        _moveHorizontal = _player.GetButtonDown("Horizontal");
+        _moveHorizontalNegative = _player.GetNegativeButtonDown("Horizontal");
+
+        ResetAimLine();
+
+        xMove = _player.GetAxis("Horizontal");
+
+        if (!Mathf.Approximately(_currentRigidbody.velocity.x, 0))
+        {
+            return;
+        }
+
+        float aimX = _player.GetAxis("AimHorizontal");
+        float aimY = _player.GetAxis("AimVertical");
+
+        var aimDirection = new Vector2(aimX, aimY);
+        var aimNormilized = aimDirection.normalized;
+        var playerPosition = new Vector2(
+            _currentRigidbody.position.x,
+            _currentRigidbody.position.y
+        );
+
+        _aimLine.Start = _currentRigidbody.position;
+        _aimLine.End = playerPosition + aimNormilized;
     }
 
     private void FixedUpdate()
@@ -121,35 +172,11 @@ public class PlayerController : MonoBehaviour
 
     private EPlayerState NormalUpdate()
     {
-        if (_player.GetButtonDown("GrabBody"))
-        {
-            var collider = Physics2D.OverlapCircle(
-                _currentRigidbody.position,
-                1.0f,
-                _bodyLayerMask.value
-            );
-
-            if (collider != null && collider.TryGetComponent<Body>(out var body))
-            {
-                _currentRigidbody = body.Rigidbody2D;
-                _controlBody = true;
-            }
-            else
-            {
-                _currentRigidbody = _rb2d;
-                _controlBody = false;
-            }
-        }
-
-        ResetAimLine();
-
-        float xMove = _player.GetAxis("Horizontal");
-
         var speed = _currentRigidbody.velocity;
         speed.x = Mathf.MoveTowards(speed.x, xMove * _maxHSpeed, _acceleration * Time.deltaTime);
         _currentRigidbody.velocity = speed;
 
-        if (_player.GetButtonDown("Horizontal") || _player.GetNegativeButtonDown("Horizontal"))
+        if (_moveHorizontal || _moveHorizontalNegative)
         {
             _currentRigidbody.AddForce(Vector2.down * 3f, ForceMode2D.Impulse);
         }
@@ -174,23 +201,7 @@ public class PlayerController : MonoBehaviour
             _currentRigidbody.AddForce(Vector2.down * springForce);
         }
 
-        if (!Mathf.Approximately(_currentRigidbody.velocity.x, 0))
-        {
-            return EPlayerState.Normal;
-        }
-
-        float aimX = _player.GetAxis("AimHorizontal");
-        float aimY = _player.GetAxis("AimVertical");
-
-        var aimDirection = new Vector2(aimX, aimY);
-        var aimNormilized = aimDirection.normalized;
-        var playerPosition = new Vector2(
-            _currentRigidbody.position.x,
-            _currentRigidbody.position.y
-        );
-
-        _aimLine.Start = _currentRigidbody.position;
-        _aimLine.End = playerPosition + aimNormilized;
+        
 
         return EPlayerState.Normal;
     }
