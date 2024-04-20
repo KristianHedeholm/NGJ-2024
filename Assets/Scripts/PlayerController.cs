@@ -1,8 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using Rewired;
-using UnityEngine;
 using Shapes;
+using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
@@ -68,7 +66,7 @@ public class PlayerController : MonoBehaviour
         ResetAimLine();
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         UpdateState();
     }
@@ -123,11 +121,15 @@ public class PlayerController : MonoBehaviour
 
     private EPlayerState NormalUpdate()
     {
-        if(_player.GetButtonDown("GrabBody"))
+        if (_player.GetButtonDown("GrabBody"))
         {
-            var collider = Physics2D.OverlapCircle(_currentRigidbody.position, 1.0f, _bodyLayerMask.value);
+            var collider = Physics2D.OverlapCircle(
+                _currentRigidbody.position,
+                1.0f,
+                _bodyLayerMask.value
+            );
 
-            if(collider != null && collider.TryGetComponent<Body>(out var body))
+            if (collider != null && collider.TryGetComponent<Body>(out var body))
             {
                 _currentRigidbody = body.Rigidbody2D;
                 _controlBody = true;
@@ -172,7 +174,7 @@ public class PlayerController : MonoBehaviour
             _currentRigidbody.AddForce(Vector2.down * springForce);
         }
 
-        if(!Mathf.Approximately(_currentRigidbody.velocity.x, 0))
+        if (!Mathf.Approximately(_currentRigidbody.velocity.x, 0))
         {
             return EPlayerState.Normal;
         }
@@ -182,11 +184,13 @@ public class PlayerController : MonoBehaviour
 
         var aimDirection = new Vector2(aimX, aimY);
         var aimNormilized = aimDirection.normalized;
-        var playerPosition = new Vector2(_currentRigidbody.position.x, _currentRigidbody.position.y);
+        var playerPosition = new Vector2(
+            _currentRigidbody.position.x,
+            _currentRigidbody.position.y
+        );
 
         _aimLine.Start = _currentRigidbody.position;
         _aimLine.End = playerPosition + aimNormilized;
-
 
         return EPlayerState.Normal;
     }
@@ -206,8 +210,6 @@ public class PlayerController : MonoBehaviour
 
     private EPlayerState CrystalUpdate()
     {
-        
-        
         return EPlayerState.Crystal;
     }
 
