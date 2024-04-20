@@ -60,6 +60,8 @@ public class PlayerController : MonoBehaviour
     private bool _moveHorizontalNegative;
     private float _xMove;
 
+    private Crystal _crystal;
+
     private void Start()
     {
         _player = ReInput.players.GetPlayer(0);
@@ -77,75 +79,87 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        if (_state != EPlayerState.Normal)
+        if (_state == EPlayerState.Normal)
         {
-            return;
-        }
+            if (_player.GetButton("AimMode") || !_controlBody)
+            {
+                _moveHorizontal = false;
+                _moveHorizontalNegative = false;
+                _xMove = 0.0f;
 
-        if (_player.GetButton("AimMode") || !_controlBody)
-        {
-            _moveHorizontal = false;
-            _moveHorizontalNegative = false;
-            _xMove = 0.0f;
+                float aimX = _player.GetAxis("Horizontal");
+                float aimY = _player.GetAxis("Vertical");
 
-            float aimX = _player.GetAxis("Horizontal");
-            float aimY = _player.GetAxis("Vertical");
+                var aimDirection = new Vector2(aimX, aimY);
+                var aimNormilized = aimDirection.normalized;
+                var playerPosition = new Vector2(
+                    _currentRigidbody.position.x,
+                    _currentRigidbody.position.y
+                );
 
-            var aimDirection = new Vector2(aimX, aimY);
-            var aimNormilized = aimDirection.normalized;
-            var playerPosition = new Vector2(
-                _currentRigidbody.position.x,
-                _currentRigidbody.position.y
-            );
+                var endOfLinePoint = playerPosition + aimNormilized;
 
-            var endOfLinePoint = playerPosition + aimNormilized;
+                _aimLine.Start = _currentRigidbody.position;
+                _aimLine.End = endOfLinePoint;
 
-            _aimLine.Start = _currentRigidbody.position;
-            _aimLine.End = endOfLinePoint;
+                if (_player.GetButtonDown("MainAction"))
+                {
+                    var direction = endOfLinePoint - playerPosition;
+                    var hit = Physics2D.Raycast(endOfLinePoint, direction, 5.0f, _shootingLayerMask);
+                    if (hit.collider == null)
+                    {
+                        return;
+                    }
+
+                    if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Body"))
+                    {
+                        if (hit.collider.TryGetComponent<Body>(out var body))
+                        {
+                            EnterBody(body);
+                        }
+                    }
+
+                    if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Crystal"))
+                    {
+                        if (hit.collider.TryGetComponent<Crystal>(out var crystal))
+                        {
+                            EnterCrystal(crystal);
+                            SetState(EPlayerState.Crystal);
+                        }
+                    }
+                }
+
+                return;
+            }
+
+            if (!_controlBody)
+            {
+                return;
+            }
+
+            ResetAimLine();
 
             if (_player.GetButtonDown("MainAction"))
             {
-                var direction = endOfLinePoint - playerPosition;
-                var hit = Physics2D.Raycast(endOfLinePoint, direction, 5.0f, _shootingLayerMask);
-                if (hit.collider == null)
-                {
-                    return;
-                }
+                _controlBody = false;
+                _rb2d.simulated = true;
 
-                if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Body"))
-                {
-                    if (hit.collider.TryGetComponent<Body>(out var body))
-                    {
-                        EnterBody(body);
-                    }
-                }
+                _rb2d.position = _currentRigidbody.position;
+                _currentRigidbody = _rb2d;
+                _sprite.SetActive(true);
             }
 
-            return;
+            transform.position = _currentRigidbody.position;
+
+            _moveHorizontal = _player.GetButtonDown("Horizontal");
+            _moveHorizontalNegative = _player.GetNegativeButtonDown("Horizontal");
+            _xMove = _player.GetAxis("Horizontal");
         }
 
-        if (!_controlBody)
+        if (_state == EPlayerState.Crystal)
         {
-            return;
+            float aimX = _player.GetAxis("Horizontal");
         }
-
-        ResetAimLine();
-
-        if (_player.GetButtonDown("MainAction"))
-        {
-            _controlBody = false;
-            _rb2d.simulated = true;
-
-            _rb2d.position = _currentRigidbody.position;
-            _currentRigidbody = _rb2d;
-            _sprite.SetActive(true);
-        }
-
-        transform.position = _currentRigidbody.position;
-
-        _moveHorizontal = _player.GetButtonDown("Horizontal");
-        _moveHorizontalNegative = _player.GetNegativeButtonDown("Horizontal");
-        _xMove = _player.GetAxis("Horizontal");
     }
 
     private void FixedUpdate()
@@ -157,6 +171,15 @@ public class PlayerController : MonoBehaviour
     {
         _currentRigidbody = body.Rigidbody2D;
         _controlBody = true;
+        _sprite.SetActive(false);
+        _rb2d.simulated = false;
+    }
+
+    private void EnterCrystal(Crystal crystal)
+    {
+        _crystal = crystal;
+        _currentRigidbody = null;
+        _controlBody = false;
         _sprite.SetActive(false);
         _rb2d.simulated = false;
     }
