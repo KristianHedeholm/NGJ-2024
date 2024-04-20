@@ -119,6 +119,9 @@ MonoBehaviour:
   _maxHSpeed: 5
   _acceleration: 80
   _body: {fileID: 0}
+  _bodyLayerMask:
+    serializedVersion: 2
+    m_Bits: 64
 --- !u!1 &7022380911801027599
 GameObject:
   m_ObjectHideFlags: 0
