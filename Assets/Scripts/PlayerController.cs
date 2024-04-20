@@ -40,12 +40,17 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private float _acceleration;
 
+    [SerializeField]
+    private Transform _aimMarker;
+
     private void Start()
     {
         _player = ReInput.players.GetPlayer(0);
         _rb2d = GetComponent<Rigidbody2D>();
 
         _prevState = _state = EPlayerState.Normal;
+
+        _aimMarker.gameObject.SetActive(false);
     }
 
     private void Update()
@@ -99,6 +104,9 @@ public class PlayerController : MonoBehaviour
 
     private EPlayerState NormalUpdate()
     {
+        _aimMarker.gameObject.SetActive(false);
+
+
         float xMove = _player.GetAxis("Horizontal");
 
         var speed = _rb2d.velocity;
@@ -129,6 +137,22 @@ public class PlayerController : MonoBehaviour
 
             _rb2d.AddForce(Vector2.down * springForce);
         }
+
+        if(!Mathf.Approximately(_rb2d.velocity.x, 0))
+        {
+            return EPlayerState.Normal;
+        }
+
+        _aimMarker.gameObject.SetActive(true);
+
+        float aimX = _player.GetAxis("AimHorizontal");
+        float aimY = _player.GetAxis("AimVertical");
+
+        var aimDirection = new Vector2(aimX, aimY);
+        var aimNormilized = aimDirection.normalized;
+        var playerPosition = new Vector2(transform.position.x, transform.position.y);
+        _aimMarker.position = playerPosition + aimNormilized;
+
 
         return EPlayerState.Normal;
     }
