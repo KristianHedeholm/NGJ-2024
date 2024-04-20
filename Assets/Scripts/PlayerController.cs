@@ -51,6 +51,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private LayerMask _bodyLayerMask;
 
+    [SerializeField]
+    private LayerMask _shootingLayerMask;
+
     private Rigidbody2D _currentRigidbody;
     private bool _controlBody;
     private bool _moveHorizontal;
@@ -79,7 +82,7 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        if(_player.GetButton("AimMode"))
+        if (_player.GetButton("AimMode") || !_controlBody)
         {
             _moveHorizontal = false;
             _moveHorizontalNegative = false;
@@ -103,53 +106,54 @@ public class PlayerController : MonoBehaviour
             if (_player.GetButtonDown("MainAction"))
             {
                 var direction = endOfLinePoint - playerPosition;
-                var hit = Physics2D.Raycast(endOfLinePoint, direction, 5.0f, ~0);
-            }
-        }
-        else
-        {
-            ResetAimLine();
-
-            if (_player.GetButtonDown("MainAction"))
-            {
-                if (!_controlBody)
+                var hit = Physics2D.Raycast(endOfLinePoint, direction, 5.0f, _shootingLayerMask);
+                if(hit.collider != null && hit.collider.gameObject.layer == LayerMask.NameToLayer("Body"))
                 {
-                    var collider = Physics2D.OverlapCircle(
-                    _currentRigidbody.position,
-                    1.05f,
-                    _bodyLayerMask.value
-                    );
-
-                    if (collider != null && collider.TryGetComponent<Body>(out var body))
+                    if(hit.collider.TryGetComponent<Body>(out var body))
                     {
-                        _currentRigidbody = body.Rigidbody2D;
-                        _controlBody = true;
-                        _spriteRenderer.enabled = false;
-                        _rb2d.simulated = false;
+                        EnterBody(body);
                     }
-                }
-                else
-                {
-                    _controlBody = false;
-                    _rb2d.simulated = true;
-
-                    _rb2d.position = _currentRigidbody.position;
-                    _currentRigidbody = _rb2d;
-                    _spriteRenderer.enabled = true;
-                }
+                }                
             }
 
-            transform.position = _currentRigidbody.position;
-
-            _moveHorizontal = _player.GetButtonDown("Horizontal");
-            _moveHorizontalNegative = _player.GetNegativeButtonDown("Horizontal");
-            _xMove = _player.GetAxis("Horizontal");
+            return;
         }
+
+        if (!_controlBody)
+        {
+            return;
+        }
+
+        ResetAimLine();
+
+        if (_player.GetButtonDown("MainAction"))
+        {
+            _controlBody = false;
+            _rb2d.simulated = true;
+
+            _rb2d.position = _currentRigidbody.position;
+            _currentRigidbody = _rb2d;
+            _spriteRenderer.enabled = true;
+        }
+
+        transform.position = _currentRigidbody.position;
+
+        _moveHorizontal = _player.GetButtonDown("Horizontal");
+        _moveHorizontalNegative = _player.GetNegativeButtonDown("Horizontal");
+        _xMove = _player.GetAxis("Horizontal");
     }
 
     private void FixedUpdate()
     {
         UpdateState();
+    }
+
+    private void EnterBody(Body body)
+    {
+        _currentRigidbody = body.Rigidbody2D;
+        _controlBody = true;
+        _spriteRenderer.enabled = false;
+        _rb2d.simulated = false;
     }
 
     private void UpdateState()
@@ -194,6 +198,23 @@ public class PlayerController : MonoBehaviour
         }
 
         _prevState = _state;
+    }
+
+    private void SetState(EPlayerState state)
+    {
+        switch (_state)
+        {
+            case EPlayerState.Normal:
+                _state = NormalFixUpdate();
+                break;
+            case EPlayerState.Zip:
+                _state = ZipUpdate();
+                break;
+
+            case EPlayerState.Crystal:
+                _state = CrystalUpdate();
+                break;
+        }
     }
 
     #region Player states

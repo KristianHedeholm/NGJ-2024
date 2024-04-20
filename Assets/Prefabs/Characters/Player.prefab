@@ -123,6 +123,9 @@ MonoBehaviour:
   _bodyLayerMask:
     serializedVersion: 2
     m_Bits: 64
+  _shootingLayerMask:
+    serializedVersion: 2
+    m_Bits: 320
 --- !u!1 &7022380911801027599
 GameObject:
   m_ObjectHideFlags: 0
