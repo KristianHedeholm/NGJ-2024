@@ -19,6 +19,8 @@ public class PlayerController : MonoBehaviour
     }
 
     private EPlayerState _prevState;
+
+    [SerializeField, ReadOnly]
     private EPlayerState _state;
 
     [SerializeField]
@@ -63,6 +65,8 @@ public class PlayerController : MonoBehaviour
 
     private Crystal _targetCrystal = null;
     private Body _targetBody = null;
+
+    private Body _prevBody = null;
 
     private Transform _zipTarget = null;
 
@@ -229,8 +233,10 @@ public class PlayerController : MonoBehaviour
                 && hit.collider.gameObject.layer == LayerMask.NameToLayer("Body")
             )
             {
-                if (hit.collider.TryGetComponent<Body>(out var body))
+                if (hit.collider.TryGetComponent<Body>(out var body) && body != _targetBody)
                 {
+                    _prevBody = _targetBody;
+                    _targetCrystal = null;
                     _targetBody = body;
                     _zipTarget = _targetBody.transform;
                     return EPlayerState.Zip;
@@ -242,18 +248,31 @@ public class PlayerController : MonoBehaviour
                 && hit.collider.gameObject.layer == LayerMask.NameToLayer("Crystal")
             )
             {
-                if (hit.collider.TryGetComponent<Crystal>(out var crystal))
+                if (
+                    hit.collider.TryGetComponent<Crystal>(out var crystal)
+                    && crystal != _targetCrystal
+                )
                 {
-                    EnterCrystal(crystal);
-                    return EPlayerState.Crystal;
+                    _prevBody = _targetBody;
+                    _targetBody = null;
+                    _targetCrystal = crystal;
+                    _zipTarget = crystal.transform;
+                    return EPlayerState.Zip;
                 }
             }
 
             var hitOverlap = Physics2D.OverlapCircle(playerPosition, 1.0f, _bodyLayerMask);
-            if (hitOverlap != null && hitOverlap.TryGetComponent<Body>(out var bodyNew))
+            if (
+                hitOverlap != null
+                && hitOverlap.TryGetComponent<Body>(out var bodyNew)
+                && bodyNew != _targetBody
+            )
             {
-                EnterBody(bodyNew);
-                return EPlayerState.Possess;
+                _targetCrystal = null;
+                _prevBody = _targetBody;
+                _targetBody = bodyNew;
+                _zipTarget = _targetBody.transform;
+                return EPlayerState.Zip;
             }
         }
 
@@ -286,14 +305,16 @@ public class PlayerController : MonoBehaviour
 
         float dist = Vector2.Distance(startPos, endPos);
 
+        ResetAimLine();
         _rb2d.simulated = false;
+        _sprite.SetActive(true);
 
         float alpha = 0;
         while (alpha < 1)
         {
             alpha += Time.deltaTime / (dist * zipDuration);
 
-            transform.position = Vector2.Lerp(startPos, endPos, Easing.Smooth2.Step(alpha));
+            transform.position = Vector2.Lerp(startPos, endPos, Easing.Smooth2.In(alpha));
             yield return null;
         }
 
@@ -329,11 +350,23 @@ public class PlayerController : MonoBehaviour
 
     private EPlayerState CrystalUpdate()
     {
-        if (_targetCrystal == null)
-            return EPlayerState.Normal;
+        var newState = HandleAiming();
+        if (newState != _state)
+        {
+            return newState;
+        }
 
         float angel = _player.GetAxis2D("Horizontal", "Vertical").ToAngleDeg();
         _targetCrystal.SetTargetAngel(angel);
+
+        if (_player.GetButtonDown("MainAction"))
+        {
+            _targetCrystal = null;
+            _targetBody = _prevBody;
+            if (_targetBody != null)
+                _zipTarget = _targetBody.transform;
+            return EPlayerState.Zip;
+        }
 
         return EPlayerState.Crystal;
     }
@@ -353,6 +386,7 @@ public class PlayerController : MonoBehaviour
 
         if (_player.GetButtonDown("MainAction"))
         {
+            _prevBody = _targetBody;
             _targetCrystal = null;
             _targetBody = null;
             _zipTarget = null;
