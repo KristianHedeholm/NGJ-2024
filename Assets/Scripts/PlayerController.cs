@@ -95,8 +95,16 @@ public class PlayerController : MonoBehaviour
                 _currentRigidbody.position.y
             );
 
+            var endOfLinePoint = playerPosition + aimNormilized;
+
             _aimLine.Start = _currentRigidbody.position;
-            _aimLine.End = playerPosition + aimNormilized;
+            _aimLine.End = endOfLinePoint;
+
+            if (_player.GetButtonDown("MainAction"))
+            {
+                var direction = endOfLinePoint - playerPosition;
+                var hit = Physics2D.Raycast(endOfLinePoint, direction, 5.0f, ~0);
+            }
         }
         else
         {
