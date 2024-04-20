@@ -23,6 +23,9 @@ public class PlayerController : MonoBehaviour
     private LayerMask collisionMask;
 
     [SerializeField]
+    private SpriteRenderer _spriteRenderer;
+
+    [SerializeField]
     private float rideHeight;
 
     [SerializeField]
@@ -78,18 +81,34 @@ public class PlayerController : MonoBehaviour
 
         if (_player.GetButtonDown("GrabBody"))
         {
-            var collider = Physics2D.OverlapCircle(
+            if(!_controlBody)
+            {
+                var collider = Physics2D.OverlapCircle(
                 _currentRigidbody.position,
                 1.05f,
                 _bodyLayerMask.value
-            );
+                );
 
-            if (collider != null && collider.TryGetComponent<Body>(out var body))
-            {
-                _currentRigidbody = body.Rigidbody2D;
-                _controlBody = true;
+                if (collider != null && collider.TryGetComponent<Body>(out var body))
+                {
+                    _currentRigidbody = body.Rigidbody2D;
+                    _controlBody = true;
+                    _spriteRenderer.enabled = false;
+                    _rb2d.simulated = false;
+                }
             }
+            else
+            {
+                _controlBody = false;
+                _rb2d.simulated = true;
+                
+                _rb2d.position = _currentRigidbody.position;
+                _currentRigidbody = _rb2d;
+                _spriteRenderer.enabled = true;
+            }            
         }
+
+        transform.position = _currentRigidbody.position;
 
         _moveHorizontal = _player.GetButtonDown("Horizontal");
         _moveHorizontalNegative = _player.GetNegativeButtonDown("Horizontal");
