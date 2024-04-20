@@ -15,6 +15,7 @@ public class PlayerController : MonoBehaviour
     {
         Normal,
         Zip, // Teleporting through light
+        Crystal,
     }
 
     private EPlayerState _prevState;
@@ -42,6 +43,9 @@ public class PlayerController : MonoBehaviour
     private float _acceleration;
 
     private Line _aimLine;
+
+    [SerializeField]
+    private Body _body = null;
 
     private void Start()
     {
@@ -71,6 +75,10 @@ public class PlayerController : MonoBehaviour
                 break;
             case EPlayerState.Zip:
                 _state = ZipUpdate();
+                break;
+
+            case EPlayerState.Crystal:
+                _state = CrystalUpdate();
                 break;
         }
 
@@ -108,21 +116,28 @@ public class PlayerController : MonoBehaviour
 
     private EPlayerState NormalUpdate()
     {
+       
+        var rb2d = _rb2d;
+        if(_body != null)
+        {
+            rb2d = _body.Rigidbody2D;
+        }
+        
         ResetAimLine();
 
         float xMove = _player.GetAxis("Horizontal");
 
-        var speed = _rb2d.velocity;
+        var speed = rb2d.velocity;
         speed.x = Mathf.MoveTowards(speed.x, xMove * _maxHSpeed, _acceleration * Time.deltaTime);
-        _rb2d.velocity = speed;
+        rb2d.velocity = speed;
 
         if (_player.GetButtonDown("Horizontal") || _player.GetNegativeButtonDown("Horizontal"))
         {
-            _rb2d.AddForce(Vector2.down * 3f, ForceMode2D.Impulse);
+            rb2d.AddForce(Vector2.down * 3f, ForceMode2D.Impulse);
         }
 
         RaycastHit2D hit = Physics2D.Raycast(
-            transform.position,
+            rb2d.position,
             Vector3.down,
             rayDistance,
             collisionMask
@@ -130,7 +145,7 @@ public class PlayerController : MonoBehaviour
 
         if (hit.collider != null)
         {
-            Vector2 vel = _rb2d.velocity;
+            Vector2 vel = rb2d.velocity;
 
             float rayDirVel = Vector2.Dot(Vector2.down, vel);
 
@@ -138,10 +153,10 @@ public class PlayerController : MonoBehaviour
 
             float springForce = (x * rideSpringStrength) - (rayDirVel * rideSpringDamp);
 
-            _rb2d.AddForce(Vector2.down * springForce);
+            rb2d.AddForce(Vector2.down * springForce);
         }
 
-        if(!Mathf.Approximately(_rb2d.velocity.x, 0))
+        if(!Mathf.Approximately(rb2d.velocity.x, 0))
         {
             return EPlayerState.Normal;
         }
@@ -151,9 +166,9 @@ public class PlayerController : MonoBehaviour
 
         var aimDirection = new Vector2(aimX, aimY);
         var aimNormilized = aimDirection.normalized;
-        var playerPosition = new Vector2(transform.position.x, transform.position.y);
+        var playerPosition = new Vector2(rb2d.position.x, rb2d.position.y);
 
-        _aimLine.Start = _rb2d.position;
+        _aimLine.Start = rb2d.position;
         _aimLine.End = playerPosition + aimNormilized;
 
 
@@ -170,6 +185,17 @@ public class PlayerController : MonoBehaviour
     }
 
     private void ZipEnd() { }
+
+    private void CrystalStart() { }
+
+    private EPlayerState CrystalUpdate()
+    {
+        
+        
+        return EPlayerState.Crystal;
+    }
+
+    private void CrystalEnd() { }
 
     private void ResetAimLine()
     {
