@@ -8,18 +8,18 @@ using UnityEngine.UI;
 public class UI_ButtonHover : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     public TextMeshProUGUI ButtonText;
-    public Color HoverColor;
+    public VertexGradient HoverColor;
     public Image ButtonIcon;
     public Sprite HoverSprite;
     public Image ButtonBG;
 
-    private Color IdleColor;
+    private VertexGradient IdleColor;
     private Sprite IdleSprite;
 
     void Start()
     {
         // Store the original color of the text
-        IdleColor = ButtonText.color;
+        IdleColor = ButtonText.colorGradient;
         IdleSprite = ButtonIcon.sprite;
     }
 
@@ -27,7 +27,8 @@ public class UI_ButtonHover : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     public void OnPointerEnter(PointerEventData eventData)
     {
         // Change the text color to the hover color
-        ButtonText.color = HoverColor;
+        ButtonText.enableVertexGradient = true;
+        ButtonText.colorGradient = HoverColor;
 
         // Toggle the underlay effect on
         ButtonText.fontMaterial.EnableKeyword("UNDERLAY_ON");
@@ -40,13 +41,15 @@ public class UI_ButtonHover : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
         // Change the ButtonBG to visible
         ButtonBG.enabled = true;
+
+        ButtonText.fontMaterial.DisableKeyword("GLOW_ON");
     }
 
     // Called when the pointer exits the button
     public void OnPointerExit(PointerEventData eventData)
     {
         // Restore the original text color
-        ButtonText.color = IdleColor;
+        ButtonText.colorGradient = IdleColor;
 
         // Toggle the underlay effect off
         ButtonText.fontMaterial.DisableKeyword("UNDERLAY_ON");
@@ -56,5 +59,7 @@ public class UI_ButtonHover : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
         // Change the ButtonBG to invisible
         ButtonBG.enabled = false;
+
+        ButtonText.fontMaterial.EnableKeyword("GLOW_ON");
     }
 }
