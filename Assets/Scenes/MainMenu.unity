@@ -3078,7 +3078,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
   m_AnchoredPosition: {x: 470, y: 780}
-  m_SizeDelta: {x: 200, y: 50}
+  m_SizeDelta: {x: 343.471, y: 50}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &2037314078
 MonoBehaviour:
@@ -3100,7 +3100,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: GAME TITLE
+  m_text: POSSESSION
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8c6882cdcabeb31429711064760a2170, type: 2}
   m_sharedMaterial: {fileID: -2602478439186545015, guid: 8c6882cdcabeb31429711064760a2170, type: 2}
