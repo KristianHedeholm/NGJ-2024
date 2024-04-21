@@ -257,9 +257,14 @@ public class PlayerController : MonoBehaviour
             {
                 if (hit.collider.TryGetComponent<Body>(out var body) && body != _targetBody)
                 {
+                    
                     _prevBody = _targetBody;
                     _targetCrystal = null;
                     _targetBody = body;
+                    if(_targetBody.IsDead)
+                    {
+                        _targetBody.TriggerAwake();
+                    }
                     _zipTarget = _targetBody.transform;
                     return EPlayerState.Zip;
                 }
@@ -275,6 +280,7 @@ public class PlayerController : MonoBehaviour
                     && crystal != _targetCrystal
                 )
                 {
+                    _targetBody.TriggerDead();
                     _prevBody = _targetBody;
                     _targetBody = null;
                     _targetCrystal = crystal;
