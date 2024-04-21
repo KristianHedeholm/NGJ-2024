@@ -5,6 +5,7 @@ using UnityEngine;
 public class Body : MonoBehaviour
 {
     public Rigidbody2D Rigidbody2D => _rigidbody2D;
+    public bool IsDead { get; private set; }
 
     [SerializeField]
     private Rigidbody2D _rigidbody2D;
@@ -28,6 +29,17 @@ public class Body : MonoBehaviour
     public void SetIsAiming(bool isAiming)
     {
         _animator.SetBool("isAiming", isAiming);
+    }
+
+    public void TriggerDead()
+    {
+        _animator.SetTrigger("Die");
+        IsDead = true;
+    }
+
+    public void TriggerAwake()
+    {
+        _animator.SetTrigger("Awake");
     }
 
     private void UpdateFlip()
