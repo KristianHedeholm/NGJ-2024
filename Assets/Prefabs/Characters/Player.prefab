@@ -127,7 +127,7 @@ MonoBehaviour:
     m_Bits: 64
   _shootingLayerMask:
     serializedVersion: 2
-    m_Bits: 320
+    m_Bits: 328
   zipDuration: 0.1
 --- !u!95 &883721561121284949
 Animator:
