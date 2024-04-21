@@ -190,7 +190,7 @@ Camera:
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 383
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -343,7 +343,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 505719657112367580, guid: b26f09419ed1c9149bd9f113809cf2be, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1.442
+      value: -1.82
       objectReference: {fileID: 0}
     - target: {fileID: 505719657112367580, guid: b26f09419ed1c9149bd9f113809cf2be, type: 3}
       propertyPath: m_LocalPosition.y
@@ -404,11 +404,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3619365223831747743, guid: 98edf179769b149cd8b3b8b6cfa9637c, type: 3}
       propertyPath: m_LocalScale.x
-      value: 21.407148
+      value: 30.530731
       objectReference: {fileID: 0}
     - target: {fileID: 3619365223831747743, guid: 98edf179769b149cd8b3b8b6cfa9637c, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.2676
+      value: -0.6185
       objectReference: {fileID: 0}
     - target: {fileID: 3619365223831747743, guid: 98edf179769b149cd8b3b8b6cfa9637c, type: 3}
       propertyPath: m_LocalPosition.y
@@ -462,7 +462,7 @@ GameObject:
   - component: {fileID: 1143694266}
   - component: {fileID: 1143694268}
   - component: {fileID: 1143694267}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Square
   m_TagString: Untagged
   m_Icon: {fileID: 0}
