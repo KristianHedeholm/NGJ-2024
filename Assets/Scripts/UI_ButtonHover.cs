@@ -5,13 +5,15 @@ using UnityEngine.EventSystems;
 using TMPro;
 using UnityEngine.UI;
 
-public class UI_ButtonHover : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public class UI_ButtonHover : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
     public TextMeshProUGUI ButtonText;
     public VertexGradient HoverColor;
     public Image ButtonIcon;
     public Sprite HoverSprite;
     public Image ButtonBG;
+    public AudioSource HoverAudio;
+    public AudioSource ClickAudio;
 
     private VertexGradient IdleColor;
     private Sprite IdleSprite;
@@ -43,6 +45,12 @@ public class UI_ButtonHover : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         ButtonBG.enabled = true;
 
         ButtonText.fontMaterial.DisableKeyword("GLOW_ON");
+
+        // Play audio clip if it's assigned
+        if (HoverAudio != null && HoverAudio.clip != null)
+        {
+            HoverAudio.Play();
+        }
     }
 
     // Called when the pointer exits the button
@@ -61,5 +69,19 @@ public class UI_ButtonHover : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         ButtonBG.enabled = false;
 
         ButtonText.fontMaterial.EnableKeyword("GLOW_ON");
+    }
+
+    // Called when the button is clicked
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        // Reset button to its idle state
+        OnPointerExit(eventData);
+
+        // Play audio clip if it's assigned
+        if (ClickAudio != null && ClickAudio.clip != null)
+        {
+            ClickAudio.Play();
+        }
+
     }
 }
