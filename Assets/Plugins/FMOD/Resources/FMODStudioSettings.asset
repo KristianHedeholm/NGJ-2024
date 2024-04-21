@@ -534,10 +534,10 @@ MonoBehaviour:
   m_Name: FMODStudioSettings
   m_EditorClassIdentifier: 
   switchSettingsMigration: 1
-  HasSourceProject: 0
-  HasPlatforms: 0
-  sourceProjectPath: 
-  sourceBankPath: FMOD
+  HasSourceProject: 1
+  HasPlatforms: 1
+  sourceProjectPath: FMOD/NGJFmod/NGJFmod.fspro
+  sourceBankPath: FMOD/NGJFmod/Build
   sourceBankPathUnformatted: 
   BankRefreshCooldown: 5
   ShowBankRefreshWindow: 1

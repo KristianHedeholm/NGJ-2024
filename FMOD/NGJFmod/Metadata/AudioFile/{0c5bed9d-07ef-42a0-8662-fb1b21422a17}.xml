@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.02.00">
+	<object class="AudioFile" id="{0c5bed9d-07ef-42a0-8662-fb1b21422a17}">
+		<property name="assetPath">
+			<value>ui_hover.ogg</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>48</value>
+		</property>
+		<property name="channelCount">
+			<value>2</value>
+		</property>
+		<property name="length">
+			<value>0.47729166666666667</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{a141098f-56a8-4534-9166-9891f5a6700e}</destination>
+		</relationship>
+	</object>
+</objects>

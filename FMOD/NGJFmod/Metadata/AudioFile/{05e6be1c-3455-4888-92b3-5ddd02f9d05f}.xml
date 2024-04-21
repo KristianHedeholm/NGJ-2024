@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.02.00">
+	<object class="AudioFile" id="{05e6be1c-3455-4888-92b3-5ddd02f9d05f}">
+		<property name="assetPath">
+			<value>ghoul_step_1.ogg</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>48</value>
+		</property>
+		<property name="channelCount">
+			<value>2</value>
+		</property>
+		<property name="length">
+			<value>0.56252083333333336</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{a141098f-56a8-4534-9166-9891f5a6700e}</destination>
+		</relationship>
+	</object>
+</objects>

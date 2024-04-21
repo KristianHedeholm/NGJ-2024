@@ -1,4 +1,6 @@
 using System.Collections;
+using FMOD.Studio;
+using FMODUnity;
 using Rewired;
 using Shapes;
 using UnityEngine;
@@ -73,6 +75,8 @@ public class PlayerController : MonoBehaviour
 
     private Vector2 _zipPoint;
 
+    private EventInstance crystalLoop;
+
     private void Start()
     {
         _player = ReInput.players.GetPlayer(0);
@@ -84,6 +88,8 @@ public class PlayerController : MonoBehaviour
         var prefab = LineManager.Instance.GetLine(LineManager.Line.AimLine);
         var gameObject = Instantiate(prefab, Vector3.zero, Quaternion.identity);
         _aimLine = gameObject.GetComponent<Line>();
+
+        crystalLoop = RuntimeManager.CreateInstance(FMODEvents.Instance.CrystalLoop);
 
         ResetAimLine();
     }
@@ -146,6 +152,7 @@ public class PlayerController : MonoBehaviour
         _currentRigidbody = body.Rigidbody2D;
         _sprite.SetActive(false);
         _rb2d.simulated = false;
+        AudioManager.Instance.PlayOneShot(FMODEvents.Instance.GhoulEnter);
     }
 
     private void EnterCrystal(Crystal crystal)
@@ -155,6 +162,8 @@ public class PlayerController : MonoBehaviour
         _rb2d.simulated = false;
         _currentRigidbody = _rb2d;
         _sprite.SetActive(false);
+        AudioManager.Instance.PlayOneShot(FMODEvents.Instance.CrystalEnter);
+        crystalLoop.start();
     }
 
     private void UpdateState()
@@ -257,11 +266,10 @@ public class PlayerController : MonoBehaviour
             {
                 if (hit.collider.TryGetComponent<Body>(out var body) && body != _targetBody)
                 {
-                    
                     _prevBody = _targetBody;
                     _targetCrystal = null;
                     _targetBody = body;
-                    if(_targetBody.IsDead)
+                    if (_targetBody.IsDead)
                     {
                         _targetBody.TriggerAwake();
                     }
@@ -299,7 +307,7 @@ public class PlayerController : MonoBehaviour
                 _targetCrystal = null;
                 _prevBody = _targetBody;
                 _targetBody = bodyNew;
-                if(_targetBody.IsDead)
+                if (_targetBody.IsDead)
                 {
                     _targetBody.TriggerAwake();
                 }
@@ -334,6 +342,7 @@ public class PlayerController : MonoBehaviour
 
     private void ZipStart()
     {
+        AudioManager.Instance.PlayOneShot(FMODEvents.Instance.Shoot);
         StartCoroutine(ZipRoutine());
     }
 
@@ -421,7 +430,10 @@ public class PlayerController : MonoBehaviour
         return EPlayerState.Crystal;
     }
 
-    private void CrystalEnd() { }
+    private void CrystalEnd()
+    {
+        crystalLoop.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+    }
 
     private void PossessStart() { }
 

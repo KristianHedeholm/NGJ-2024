@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 5208218536184846030}
   - component: {fileID: 4066886865095990223}
   - component: {fileID: 1802473019133693313}
+  - component: {fileID: 4723420203204180856}
   m_Layer: 0
   m_Name: GameObject
   m_TagString: Untagged
@@ -84,6 +85,60 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42bdc32a7f2774a8f804f1cbf58c8339, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &4723420203204180856
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1845523468334920303}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0afbae218d43c4158ac533baf5d32ee8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  CrystalEnter:
+    Guid:
+      Data1: -2015727203
+      Data2: 1330757105
+      Data3: -1668804957
+      Data4: -186337161
+    Path: event:/crystal_enter
+  CrystalLoop:
+    Guid:
+      Data1: 1394384370
+      Data2: 1197836535
+      Data3: 189450649
+      Data4: -1865667885
+    Path: event:/crystal_loop
+  GhoulEnter:
+    Guid:
+      Data1: 1766947930
+      Data2: 1157048752
+      Data3: 1191565985
+      Data4: -1930218401
+    Path: event:/ghoul_enter
+  MenuMusic:
+    Guid:
+      Data1: -962419433
+      Data2: 1183653685
+      Data3: 1921889700
+      Data4: -101842529
+    Path: event:/menu_loop
+  MainMusic:
+    Guid:
+      Data1: -588758797
+      Data2: 1091835739
+      Data3: -444250235
+      Data4: -1937670641
+    Path: event:/music_loop
+  Shoot:
+    Guid:
+      Data1: 904383260
+      Data2: 1235715675
+      Data3: 1292452023
+      Data4: 442810402
+    Path: event:/shoot
 --- !u!1 &9050235495478240526
 GameObject:
   m_ObjectHideFlags: 0

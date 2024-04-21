@@ -53,12 +53,18 @@ public class AudioManager : Singleton<AudioManager>
         ambInstance.start();
     }
 
+    public void StopAmbience()
+    {
+        ambInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+        ambInstance.release();
+    }
+
     public void SetGlobalParameter(string parameterName, float parameterValue)
     {
         RuntimeManager.StudioSystem.setParameterByName(parameterName, parameterValue);
     }
 
-    public static void PlayOneShot(EventReference sound, Vector3 worldPos = default)
+    public void PlayOneShot(EventReference sound, Vector3 worldPos = default)
     {
         RuntimeManager.PlayOneShot(sound, worldPos);
     }
