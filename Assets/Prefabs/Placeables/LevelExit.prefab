@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4838920460166613534}
   - component: {fileID: 1907569897289477340}
   - component: {fileID: 2530260888793768901}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: LevelExit
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -162,7 +162,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1872119627
-  m_SortingLayer: 2
+  m_SortingLayer: 1
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 81646d900d2544d7a966f271b1acee5d, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}

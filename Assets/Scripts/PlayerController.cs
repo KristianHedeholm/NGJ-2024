@@ -65,6 +65,7 @@ public class PlayerController : MonoBehaviour
 
     private Crystal _targetCrystal = null;
     private Body _targetBody = null;
+    public Body CurrentBody => _targetBody;
 
     private Body _prevBody = null;
 
