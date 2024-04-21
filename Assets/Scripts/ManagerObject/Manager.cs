@@ -4,7 +4,7 @@ public class Manager : MonoBehaviour
 {
     private void Awake()
     {
-        if(FindObjectsOfType(typeof(Manager)).Length > 1)
+        if (FindObjectsOfType<Manager>().Length > 1)
         {
             Destroy(gameObject);
         }
