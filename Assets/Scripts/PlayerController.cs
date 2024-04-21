@@ -124,7 +124,16 @@ public class PlayerController : MonoBehaviour
 
                 float x = hit.distance - rideHeight;
 
-                float springForce = (x * rideSpringStrength) - (rayDirVel * rideSpringDamp);
+                var strength = rideSpringStrength;
+                var damp = rideSpringDamp;
+
+                if (_targetBody != null)
+                {
+                    strength = _targetBody.springStrength;
+                    damp = _targetBody.springDamp;
+                }
+
+                float springForce = (x * strength) - (rayDirVel * damp);
 
                 _currentRigidbody.AddForce(Vector2.down * springForce);
             }
@@ -307,8 +316,13 @@ public class PlayerController : MonoBehaviour
         Vector2 startPos = transform.position;
         Vector2 endPos = transform.position;
 
+        Vector2 centerPosition = (startPos + endPos) / 2 + Vector2.up * 0.75f;
+
         if (_zipTarget != null)
+        {
             endPos = _zipTarget.position;
+            centerPosition = (startPos + endPos) / 2;
+        }
 
         float dist = Vector2.Distance(startPos, endPos);
 
@@ -369,9 +383,12 @@ public class PlayerController : MonoBehaviour
         if (_player.GetButtonDown("MainAction"))
         {
             _targetCrystal = null;
-            _targetBody = _prevBody;
-            if (_targetBody != null)
+            _targetBody = null;
+            if (_prevBody != null)
+            {
+                _targetBody = _prevBody;
                 _zipTarget = _targetBody.transform;
+            }
             return EPlayerState.Zip;
         }
 

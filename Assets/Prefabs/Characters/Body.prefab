@@ -159,6 +159,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _rigidbody2D: {fileID: 392393814923263640}
+  springStrength: 30
+  springDamp: 5
 --- !u!70 &7213235360894195250
 CapsuleCollider2D:
   m_ObjectHideFlags: 0

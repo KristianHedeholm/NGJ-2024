@@ -9,7 +9,6 @@ public class Body : MonoBehaviour
     [SerializeField]
     private Rigidbody2D _rigidbody2D;
 
-
-
-
+    public float springStrength;
+    public float springDamp;
 }
