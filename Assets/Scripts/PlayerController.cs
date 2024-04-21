@@ -291,6 +291,10 @@ public class PlayerController : MonoBehaviour
                 _targetCrystal = null;
                 _prevBody = _targetBody;
                 _targetBody = bodyNew;
+                if(_targetBody.IsDead)
+                {
+                    _targetBody.TriggerAwake();
+                }
                 _zipTarget = _targetBody.transform;
                 return EPlayerState.Zip;
             }
@@ -419,6 +423,7 @@ public class PlayerController : MonoBehaviour
 
         if (_player.GetButtonDown("MainAction"))
         {
+            _targetBody.TriggerDead();
             _prevBody = _targetBody;
             _targetCrystal = null;
             _targetBody = null;
