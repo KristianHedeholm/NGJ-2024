@@ -71,6 +71,8 @@ public class PlayerController : MonoBehaviour
 
     private Transform _zipTarget = null;
 
+    private Vector2 _zipPoint;
+
     private void Start()
     {
         _player = ReInput.players.GetPlayer(0);
@@ -294,6 +296,16 @@ public class PlayerController : MonoBehaviour
                 _zipTarget = _targetBody.transform;
                 return EPlayerState.Zip;
             }
+
+            if (hit.collider != null)
+            {
+                _targetCrystal = null;
+                _prevBody = _targetBody;
+                _targetBody = null;
+                _zipTarget = null;
+                _zipPoint = hit.point;
+                return EPlayerState.Zip;
+            }
         }
 
         return _state;
@@ -318,7 +330,7 @@ public class PlayerController : MonoBehaviour
     private IEnumerator ZipRoutine()
     {
         Vector2 startPos = transform.position;
-        Vector2 endPos = transform.position;
+        Vector2 endPos = _zipPoint;
 
         Vector2 centerPosition = (startPos + endPos) / 2 + Vector2.up * 0.75f;
 
@@ -423,6 +435,7 @@ public class PlayerController : MonoBehaviour
             _targetCrystal = null;
             _targetBody = null;
             _zipTarget = null;
+            _zipPoint = transform.position;
             return EPlayerState.Zip;
         }
 
