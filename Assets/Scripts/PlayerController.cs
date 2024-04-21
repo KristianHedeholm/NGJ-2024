@@ -219,6 +219,11 @@ public class PlayerController : MonoBehaviour
         _moveHorizontalNegative = false;
         _xMove = 0.0f;
 
+        if (_targetBody != null)
+        {
+            _targetBody.SetIsAiming(true);
+        }
+
         if (_player.GetAxis2D("Horizontal", "Vertical").magnitude < 0.5f)
         {
             ResetAimLine();
@@ -237,11 +242,6 @@ public class PlayerController : MonoBehaviour
 
         _aimLine.Start = _currentRigidbody.position;
         _aimLine.End = endOfLinePoint;
-
-        if(_targetBody != null)
-        {
-            _targetBody.SetIsAiming(true);
-        }
 
         if (_player.GetButtonDown("MainAction"))
         {
