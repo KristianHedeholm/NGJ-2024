@@ -95,18 +95,62 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
-    sprites: []
+    sprites:
+    - serializedVersion: 2
+      name: WALL_02_FINAL_0
+      rect:
+        serializedVersion: 2
+        x: 41
+        y: 66
+        width: 590
+        height: 477
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9153e06210b8f194ebbcfc2beea27d18
+      internalID: -847058900
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WALL_02_FINAL_1
+      rect:
+        serializedVersion: 2
+        x: 647
+        y: 25
+        width: 544
+        height: 476
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 76e004891ad687f45a23a7cf9a498977
+      internalID: -1356685918
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 7dd508d5b1610a042a6434fdc7fd77c4
     internalID: 0
     vertices: []
     indices: 
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      WALL_02_FINAL_0: -847058900
+      WALL_02_FINAL_1: -1356685918
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
