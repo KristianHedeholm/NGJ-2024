@@ -21,5 +21,11 @@ public class Body : MonoBehaviour
     {
         _animator.SetBool("isMoving", _rigidbody2D.velocity.x != 0.0f);
         _spriteRenderer.flipX = _rigidbody2D.velocity.x < 0.0f;
+
+    }
+
+    public void SetIsAiming(bool isAiming)
+    {
+        _animator.SetBool("isAiming", isAiming);
     }
 }

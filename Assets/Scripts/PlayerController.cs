@@ -88,8 +88,6 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         UpdateState();
-
-        if (_state == EPlayerState.Crystal) { }
     }
 
     private void FixedUpdate()
@@ -238,6 +236,11 @@ public class PlayerController : MonoBehaviour
 
         _aimLine.Start = _currentRigidbody.position;
         _aimLine.End = endOfLinePoint;
+
+        if(_targetBody != null)
+        {
+            _targetBody.SetIsAiming(true);
+        }
 
         if (_player.GetButtonDown("MainAction"))
         {
@@ -407,6 +410,11 @@ public class PlayerController : MonoBehaviour
         }
 
         ResetAimLine();
+
+        if (_targetBody != null)
+        {
+            _targetBody.SetIsAiming(false);
+        }
 
         if (_player.GetButtonDown("MainAction"))
         {
