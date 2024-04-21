@@ -288,7 +288,8 @@ public class PlayerController : MonoBehaviour
                     && crystal != _targetCrystal
                 )
                 {
-                    _targetBody.TriggerDead();
+                    if (_targetBody != null)
+                        _targetBody.TriggerDead();
                     _prevBody = _targetBody;
                     _targetBody = null;
                     _targetCrystal = crystal;
